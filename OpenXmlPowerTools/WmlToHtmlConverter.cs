@@ -834,7 +834,8 @@ namespace OpenXmlPowerTools
                 if ((string)tcPr.Elements(W.vMerge).Attributes(W.val).FirstOrDefault() == "restart")
                 {
                     var currentRow = element.Parent.ElementsBeforeSelf(W.tr).Count();
-                    var currentCell = element.ElementsBeforeSelf(W.tc).Count();
+                    //gridSpan合并
+                    var currentCell = element.ElementsBeforeSelf(W.tc).Select(c=>c.Elements(W.tcPr).Elements(W.gridSpan).Attributes(W.val).FirstOrDefault()?.Value??"1").Sum(c=>Convert.ToInt32(c));
                     var tbl = element.Parent.Parent;
                     int rowSpanCount = 1;
                     currentRow += 1;
@@ -843,7 +844,21 @@ namespace OpenXmlPowerTools
                         var row = tbl.Elements(W.tr).Skip(currentRow).FirstOrDefault();
                         if (row == null)
                             break;
-                        var cell2 = row.Elements(W.tc).Skip(currentCell).FirstOrDefault();
+                        var skipcell = 0;
+                        var gridspans = 0;
+                        foreach (var tc in row.Elements(W.tc))
+                        {
+                            gridspans+= Convert.ToInt32(tc.Elements(W.tcPr).Elements(W.gridSpan).Attributes(W.val).FirstOrDefault()?.Value?? "1");
+                            if (gridspans <= currentCell)
+                            {
+                                skipcell++;
+                            }
+                            else
+                            {
+                                break;
+                            }
+                        }
+                        var cell2 = row.Elements(W.tc).Skip(skipcell).FirstOrDefault();
                         if (cell2 == null)
                             break;
                         if (cell2.Elements(W.tcPr).Elements(W.vMerge).FirstOrDefault() == null)
