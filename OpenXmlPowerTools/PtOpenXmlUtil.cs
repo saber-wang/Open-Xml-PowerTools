@@ -5954,14 +5954,5 @@ listSeparator
         {
         }
     }
-    public class XHtml : XText
-    {
-        public XHtml(string text) : base(text) { }
-        public XHtml(XText text) : base(text) { }
 
-        public override void WriteTo(System.Xml.XmlWriter writer)
-        {
-            writer.WriteRaw(this.Value);
-        }
-    }
 }

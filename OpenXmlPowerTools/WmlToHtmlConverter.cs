@@ -530,7 +530,7 @@ namespace OpenXmlPowerTools
                     using (System.IO.StreamReader reader = new System.IO.StreamReader(Part.GetStream()))
                     {
                         string text = reader.ReadToEnd();
-                        var a = new XElement(Xhtml.div, new XHtml(text));
+                        var a = new XElement(Xhtml.div, new XHtmlText(text));
                         return a;
                     }
                 }

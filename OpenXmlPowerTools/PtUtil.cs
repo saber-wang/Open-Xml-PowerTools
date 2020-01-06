@@ -1237,6 +1237,16 @@ namespace OpenXmlPowerTools
         {
         }
     }
+    public class XHtmlText : XText
+    {
+        public XHtmlText(string text) : base(text) { }
+        public XHtmlText(XText text) : base(text) { }
+
+        public override void WriteTo(System.Xml.XmlWriter writer)
+        {
+            writer.WriteRaw(this.Value);
+        }
+    }
 
     public static class Xsi
     {
