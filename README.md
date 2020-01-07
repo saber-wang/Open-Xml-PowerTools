@@ -1,11 +1,31 @@
-[ARCHIVED] Open-XML-PowerTools
+﻿NuGet Feed for CI build: https://ci.appveyor.com/nuget/open-xml-powertools
+
+No NuGet.org feed at this time. We are working on it.
+
+News
+====
+Welcome, Open-Xml-PowerTools users.  As you may have learned from the repo at OfficeDev/Open-Xml-PowerTools,
+Microsoft is going to archive that repo, and will not be maintaining that repo in the future.  The good folks at
+Microsoft asked if I would maintain this repo going forward, and I said "yes, absolutely".
+
+There are two relevant branches in this repo:
+- I have merged vNext into master.  If you were using the OfficeDev/Open-Xml-PowerTools vNext branch, and if you want to
+keep using the same code, use the master branch.
+- As of right now, the vNext branch is even with master.  However, that is going to change in the next day or two - I am
+going to commit the updated, refactored DocumentAssembler.
+
+Unfortunately, this development came right as I am starting a 10-day vacation, so will need to balance making the necessary
+enhancements with my other vacation activities!  But stay tuned, I expect to make progress in the next couple of days.
+
+I will post major announcements here in the README.md, but if you want to stay more abreast of developments, follow my blog
+at [www.ericwhite.com/blog](http://www.ericwhite.com/blog).  Also, follow me on twitter: @EricWhiteDev.
+
+Warm Regards,
+
+Eric White
+
+Open-XML-PowerTools
 ===================
-This repository is no longer maintained by Microsoft. It has been archived and can still be forked and cloned for use and continued developement. 
-
-If you're looking for a fork of this project that is actively maintained, try the following: 
-
-[https://github.com/EricWhiteDev/Open-Xml-PowerTools](https://github.com/EricWhiteDev/Open-Xml-PowerTools)
-
 The Open XML PowerTools provides guidance and example code for programming with Open XML
 Documents (DOCX, XLSX, and PPTX).  It is based on, and extends the functionality
 of the [Open XML SDK](https://github.com/OfficeDev/Open-XML-SDK).
@@ -26,6 +46,8 @@ It supports scenarios such as:
 - Extracting data (along with formatting) from spreadsheets.
 
 Copyright (c) Microsoft Corporation 2012-2017
+Portions Copyright (c) Eric White Inc 2018-2019
+
 Licensed under the MIT License.
 See License in the project root for license information.
 
@@ -42,12 +64,10 @@ Open-Xml-PowerTools Content
 There is a lot of content about Open-Xml-PowerTools at the [Open-Xml-PowerTools Resource Center at OpenXmlDeveloper.org](http://openxmldeveloper.org/wiki/w/wiki/powertools-for-open-xml.aspx)
 
 See:
-- [DocumentBuilder Resource Center](http://openxmldeveloper.org/wiki/w/wiki/documentbuilder.aspx)
-- [PresentationBuilder Resource Center](http://openxmldeveloper.org/wiki/w/wiki/presentationbuilder.aspx)
-- [HtmlConverter Resource Center](http://openxmldeveloper.org/wiki/w/wiki/htmlconverter.aspx)
-- [Introduction to DocumentAssembler](https://www.youtube.com/watch?v=9QqzCgfqA2Y)
-- [Contributing to Open-Xml-PowerTools via GitHub](https://www.youtube.com/watch?v=Ii7z9L6Dkko)
-- [Gitting, Building, and Installing Open-Xml-PowerTools](https://www.youtube.com/watch?v=60w-yPDSQD0)
+- [DocumentBuilder Resource Center](http://www.ericwhite.com/blog/documentbuilder-developer-center/)
+- [PresentationBuilder Resource Center](http://www.ericwhite.com/blog/presentationbuilder-developer-center/)
+- [WmlToHtmlConverter Resource Center](http://www.ericwhite.com/blog/wmltohtmlconverter-developer-center/)
+- [DocumentAssembler Resource Center](http://www.ericwhite.com/blog/documentassembler-developer-center/)
 
 Build Instructions
 ==================
@@ -184,18 +204,4 @@ Version 3.1.00 : November 13, 2014
 Version 3.0.00 : October 29, 2014
 - New release of cmdlets that are written as 'Advanced Functions' instead of in C#.
 
-Procedures for enhancing Open-Xml-PowerTools
---------------------------------------------
-There are a variety of things to do when adding a new CmdLet to Open-Xml-PowerTools:
-- Write the new CmdLet.  Put it in the Cmdlets directory
-- Modify Open-Xml-PowerTools.psm1
-  - Call the new Cmdlet script to make the function available
-  - Modify Export-ModuleMember function to export the Cmdlet and any aliases
-- Update Readme.txt, describing the enhancement
-- Add a new test to Test-OpenXmlPowerToolsCmdlets.ps1
-
-Procedures for enhancing the core C# modules
-- Modify the code
-- Write xUnit tests
-- Write an example if necessary
-- Run xUnit tests
+This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/). For more information, see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
