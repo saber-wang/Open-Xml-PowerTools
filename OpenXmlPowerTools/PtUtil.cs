@@ -1237,6 +1237,7 @@ namespace OpenXmlPowerTools
         {
         }
     }
+
     public class XHtmlText : XText
     {
         public XHtmlText(string text) : base(text) { }
