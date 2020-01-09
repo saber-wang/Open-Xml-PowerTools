@@ -370,7 +370,7 @@ namespace OpenXmlPowerTools
                 styleElement.Value = styleValue;
             else
             {
-                styleElement = new XElement(Xhtml.style, styleValue);
+                styleElement = new XElement(Xhtml.style,new XHtmlText(styleValue));
                 var head = xhtml.Element(Xhtml.head);
                 if (head != null)
                     head.Add(styleElement);
@@ -540,9 +540,9 @@ namespace OpenXmlPowerTools
                 {
                     using (System.IO.StreamReader reader = new System.IO.StreamReader(Part.GetStream()))
                     {
+                       var altChunk = new XAttribute("altchunk", "html");
                         string text = reader.ReadToEnd();
-                        var a = new XElement(Xhtml.div, new XHtmlText(text));
-                        return a;
+                        return new XElement(Xhtml.div, altChunk, new XHtmlText(text));
                     }
                 }
             }
@@ -846,7 +846,13 @@ namespace OpenXmlPowerTools
                 {
                     var currentRow = element.Parent.ElementsBeforeSelf(W.tr).Count();
                     //gridSpan合并
-                    var currentCell = element.ElementsBeforeSelf(W.tc).Select(c => (int?)c.Elements(W.tcPr).Elements(W.gridSpan).Attributes(W.val).FirstOrDefault() ?? 1).Sum(c => Convert.ToInt32(c));
+                    var currentCell = element.ElementsBeforeSelf(W.tc)
+                                        .Select(c => (int?)c.Elements(W.tcPr)
+                                                    .Elements(W.gridSpan)
+                                                    .Attributes(W.val)
+                                                    .FirstOrDefault() ?? 1)
+                                        .Sum(c => Convert.ToInt32(c));
+
                     var tbl = element.Parent.Parent;
                     int rowSpanCount = 1;
                     currentRow += 1;
@@ -859,7 +865,11 @@ namespace OpenXmlPowerTools
                         var gridspans = 0;
                         foreach (var tc in row.Elements(W.tc))
                         {
-                            gridspans += Convert.ToInt32(tc.Elements(W.tcPr).Elements(W.gridSpan).Attributes(W.val).FirstOrDefault()?.Value ?? "1");
+                            gridspans += Convert.ToInt32(tc.Elements(W.tcPr)
+                                                           .Elements(W.gridSpan)
+                                                           .Attributes(W.val)
+                                                           .FirstOrDefault()?.Value ?? "1");
+
                             if (gridspans <= currentCell)
                             {
                                 skipcell++;
