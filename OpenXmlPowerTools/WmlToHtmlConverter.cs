@@ -49,6 +49,11 @@ namespace OpenXmlPowerTools
         public Dictionary<string, Func<string, int, string, string>> ListItemImplementations;
         public Func<ImageInfo, XElement> ImageHandler;
 
+        /// <summary>
+        /// unit:px.
+        /// </summary>
+        public int A4ReferenceWidth;
+
         public WmlToHtmlConverterSettings()
         {
             PageTitle = "";
@@ -72,6 +77,7 @@ namespace OpenXmlPowerTools
             RestrictToSupportedNumberingFormats = htmlConverterSettings.RestrictToSupportedNumberingFormats;
             ListItemImplementations = htmlConverterSettings.ListItemImplementations;
             ImageHandler = htmlConverterSettings.ImageHandler;
+            A4ReferenceWidth = htmlConverterSettings.A4ReferenceWidth;
         }
     }
 
@@ -87,6 +93,11 @@ namespace OpenXmlPowerTools
         public bool RestrictToSupportedNumberingFormats;
         public Dictionary<string, Func<string, int, string, string>> ListItemImplementations;
         public Func<ImageInfo, XElement> ImageHandler;
+
+        /// <summary>
+        /// unit:px.
+        /// </summary>
+        public int A4ReferenceWidth;
 
         public HtmlConverterSettings()
         {
@@ -835,7 +846,7 @@ namespace OpenXmlPowerTools
                 {
                     var currentRow = element.Parent.ElementsBeforeSelf(W.tr).Count();
                     //gridSpan合并
-                    var currentCell = element.ElementsBeforeSelf(W.tc).Select(c=>c.Elements(W.tcPr).Elements(W.gridSpan).Attributes(W.val).FirstOrDefault()?.Value??"1").Sum(c=>Convert.ToInt32(c));
+                    var currentCell = element.ElementsBeforeSelf(W.tc).Select(c => (int?)c.Elements(W.tcPr).Elements(W.gridSpan).Attributes(W.val).FirstOrDefault() ?? 1).Sum(c => Convert.ToInt32(c));
                     var tbl = element.Parent.Parent;
                     int rowSpanCount = 1;
                     currentRow += 1;
@@ -848,7 +859,7 @@ namespace OpenXmlPowerTools
                         var gridspans = 0;
                         foreach (var tc in row.Elements(W.tc))
                         {
-                            gridspans+= Convert.ToInt32(tc.Elements(W.tcPr).Elements(W.gridSpan).Attributes(W.val).FirstOrDefault()?.Value?? "1");
+                            gridspans += Convert.ToInt32(tc.Elements(W.tcPr).Elements(W.gridSpan).Attributes(W.val).FirstOrDefault()?.Value ?? "1");
                             if (gridspans <= currentCell)
                             {
                                 skipcell++;
@@ -995,22 +1006,49 @@ namespace OpenXmlPowerTools
                     return sectAnnotation != null ? sectAnnotation.SectionElement.ToString() : "";
                 });
 
+            //each point of the width
+            decimal pointwidth = 0m;
+            if (settings.A4ReferenceWidth > 0)
+            {
+                pointwidth = settings.A4ReferenceWidth / 11906m;
+            }
+
             // note: when creating a paging html converter, need to pay attention to w:rtlGutter element.
             var divList = groupedIntoDivs
                 .Select(g =>
                 {
+                    Dictionary<string, string> style = new Dictionary<string, string>();
+
                     var sectPr = g.First().Annotation<SectionAnnotation>();
+
+                    //A4 point wide
+                    int w = 11906;
+
                     XElement bidi = null;
                     if (sectPr != null)
                     {
+                        w = (int?)sectPr
+                            .SectionElement
+                            .Elements(W.pgSz)
+                            .FirstOrDefault()
+                            .Attribute(W._w) ?? w;
+
                         bidi = sectPr
                             .SectionElement
                             .Elements(W.bidi)
                             .FirstOrDefault(b => b.Attribute(W.val) == null || b.Attribute(W.val).ToBoolean() == true);
                     }
+
+                    if (pointwidth > 0m)
+                    {
+                        style.AddIfMissing("margin", "auto");
+                        style.AddIfMissing("width", $"{Math.Round(pointwidth * w, MidpointRounding.AwayFromZero)}px");
+                    }
+
                     if (sectPr == null || bidi == null)
                     {
                         var div = new XElement(Xhtml.div, CreateBorderDivs(wordDoc, settings, g));
+                        div.AddAnnotation(style);
                         return div;
                     }
                     else
@@ -1018,6 +1056,7 @@ namespace OpenXmlPowerTools
                         var div = new XElement(Xhtml.div,
                             new XAttribute("dir", "rtl"),
                             CreateBorderDivs(wordDoc, settings, g));
+                        div.AddAnnotation(style);
                         return div;
                     }
                 });
