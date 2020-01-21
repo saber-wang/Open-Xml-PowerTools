@@ -1,6 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>net45;net46;netstandard2.0</TargetFrameworks>
+    <Version>4.4.14</Version>
+    <PackageId>OpenXmlPowerTools-saberwang</PackageId>
+    <Authors>saberwang,Eric White</Authors>
+    <Description>分叉自https://github.com/EricWhiteDev/Open-Xml-PowerTools，并修复WmlToHtmlConverter的部分bug</Description>
+    <RepositoryUrl>https://github.com/saber-wang/Open-Xml-PowerTools</RepositoryUrl>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageReleaseNotes>分叉自https://github.com/EricWhiteDev/Open-Xml-PowerTools，并修复WmlToHtmlConverter的部分bug</PackageReleaseNotes>
+    <PackageLicenseUrl>https://github.com/saber-wang/Open-Xml-PowerTools/blob/vNext/LICENSE</PackageLicenseUrl>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <PackageProjectUrl>https://github.com/saber-wang/Open-Xml-PowerTools</PackageProjectUrl>
   </PropertyGroup>
 
   <ItemGroup>

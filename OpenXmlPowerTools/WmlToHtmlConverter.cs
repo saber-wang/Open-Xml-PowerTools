@@ -50,9 +50,9 @@ namespace OpenXmlPowerTools
         public Func<ImageInfo, XElement> ImageHandler;
 
         /// <summary>
-        /// unit:px.
+        /// automatic width control,default:false.
         /// </summary>
-        public int A4ReferenceWidth;
+        public bool AutoWide;
 
         public WmlToHtmlConverterSettings()
         {
@@ -64,6 +64,7 @@ namespace OpenXmlPowerTools
             RestrictToSupportedLanguages = false;
             RestrictToSupportedNumberingFormats = false;
             ListItemImplementations = ListItemRetrieverSettings.DefaultListItemTextImplementations;
+            AutoWide = false;
         }
 
         public WmlToHtmlConverterSettings(HtmlConverterSettings htmlConverterSettings)
@@ -77,7 +78,7 @@ namespace OpenXmlPowerTools
             RestrictToSupportedNumberingFormats = htmlConverterSettings.RestrictToSupportedNumberingFormats;
             ListItemImplementations = htmlConverterSettings.ListItemImplementations;
             ImageHandler = htmlConverterSettings.ImageHandler;
-            A4ReferenceWidth = htmlConverterSettings.A4ReferenceWidth;
+            AutoWide = htmlConverterSettings.AutoWide;
         }
     }
 
@@ -95,9 +96,9 @@ namespace OpenXmlPowerTools
         public Func<ImageInfo, XElement> ImageHandler;
 
         /// <summary>
-        /// unit:px.
+        /// automatic width control,default:false.
         /// </summary>
-        public int A4ReferenceWidth;
+        public bool AutoWide;
 
         public HtmlConverterSettings()
         {
@@ -109,6 +110,7 @@ namespace OpenXmlPowerTools
             RestrictToSupportedLanguages = false;
             RestrictToSupportedNumberingFormats = false;
             ListItemImplementations = ListItemRetrieverSettings.DefaultListItemTextImplementations;
+            AutoWide = false;
         }
     }
 
@@ -1016,13 +1018,6 @@ namespace OpenXmlPowerTools
                     return sectAnnotation != null ? sectAnnotation.SectionElement.ToString() : "";
                 });
 
-            //each point of the width
-            decimal pointwidth = 0m;
-            if (settings.A4ReferenceWidth > 0)
-            {
-                pointwidth = settings.A4ReferenceWidth / 11906m;
-            }
-
             // note: when creating a paging html converter, need to pay attention to w:rtlGutter element.
             var divList = groupedIntoDivs
                 .Select(g =>
@@ -1032,16 +1027,26 @@ namespace OpenXmlPowerTools
                     var sectPr = g.First().Annotation<SectionAnnotation>();
 
                     //A4 point wide
-                    int w = 11906;
+                    decimal w = 11906m;
 
                     XElement bidi = null;
                     if (sectPr != null)
                     {
-                        w = (int?)sectPr
+                        //PageSize
+                        w = (decimal?)sectPr
                             .SectionElement
                             .Elements(W.pgSz)
                             .FirstOrDefault()
                             .Attribute(W._w) ?? w;
+
+                        //PageMargin
+                        var pgMar = sectPr
+                            .SectionElement
+                            .Elements(W.pgMar)
+                            .FirstOrDefault();
+                        var right= (decimal?)pgMar?.Attribute(W.right) ?? 0m;
+                        var left = (decimal?)pgMar?.Attribute(W.left) ?? 0m;
+                        w = w - right - left;
 
                         bidi = sectPr
                             .SectionElement
@@ -1049,10 +1054,10 @@ namespace OpenXmlPowerTools
                             .FirstOrDefault(b => b.Attribute(W.val) == null || b.Attribute(W.val).ToBoolean() == true);
                     }
 
-                    if (pointwidth > 0m)
+                    if (settings.AutoWide)
                     {
                         style.AddIfMissing("margin", "auto");
-                        style.AddIfMissing("width", $"{Math.Round(pointwidth * w, MidpointRounding.AwayFromZero)}px");
+                        style.AddIfMissing("width", $"{Math.Round(w/20,2, MidpointRounding.AwayFromZero)}pt");
                     }
 
                     if (sectPr == null || bidi == null)
